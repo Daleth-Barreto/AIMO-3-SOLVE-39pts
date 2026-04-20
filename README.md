@@ -28,7 +28,7 @@ graph TD
     G -->|>= 5 Matches| H[Dynamic Early Stopping]
     G -->|< 5 Matches| I[Deterministic Model Verification]
     I --> J[Entropy-Weighted Voting]
-    H --> K[\boxed{Final Answer}\]
+    H --> K[Final Answer]
     J --> K
 ```
 
@@ -65,7 +65,15 @@ The solution does not rely on simple majority voting. Instead, it employs a mult
 | **Phase 3** | **Entropy Fallback** | The answer with the highest confidence weight is selected using the generated log-probabilities. |
 
 ### Entropy-Weighted Selection
-For every generated answer *a*, we compute the mean Shannon entropy *S* of its token distribution. We apply a weight *W = 1 / S*. The final selection is the answer that maximizes the sum of its weights across all attempts, favoring "confident" generations over "uncertain" ones.
+For every generated answer $a$, we compute the mean Shannon entropy $S$ of its token distribution:
+
+$$S = -\frac{1}{N} \sum_{i=1}^{N} \sum_{j} p_{i,j} \log_2(p_{i,j})$$
+
+Where $p_{i,j}$ are the top-5 logprobs for each token. We then apply a weight:
+
+$$W = \frac{1}{\max(S, 10^{-9})}$$
+
+The final selection is the answer that maximizes the sum of its weights across all attempts, favoring "confident" generations over "uncertain" ones.
 
 ## 🚀 Key Features
 
